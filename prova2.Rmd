@@ -1,0 +1,308 @@
+---
+title: "Prova 2 - Planejamento de Experimentos"
+author: "Camila Braz Soares"
+date: "3 de junho de 2021"
+output: pdf_document
+---
+
+# QUESTÃO 1
+
+Temos o interesse de fazer o planejamento de experimentos para uma horta com seis canteiros compridos, no qual cada canteiro comporta cinco parcelas. Assim, desejamos comparar cinco tratamentos que podem ser repetidos seis vezes.
+
+Faremos um planejamento inteiramente casualizado para a plantação de hortaliças de modo que serão plantadas numa horta com seis canteiros, em que cada canteiro comporta cinco parcelas. Dessa forma faremos a comparação de seis tratamentos que serão repetidos cinco vezes.
+
+Assim, desejamos verificar se existe diferença entre os tratamentos.
+
+## Letra A
+
+### Modelo:
+ 
+$$ Y_{ij} =  \mu + \tau_i + \varepsilon_{ij} $$ 
+$i = 1,\dots,I$
+
+$j = 1,\dots,J $
+
+onde 
+
+- $Y_{ij}$ é valor observado na parcela para o i-ésimo tratamento e j-ésima repetição ;
+
+- $\mu$ é uma constante inerente a todas as parcelas, geralmente a média geral ;
+ 
+- $\tau_i$ é o efeito do i-ésimo tratamento;
+
+- $e_{ij}$ é o erro experimental na parcela i,j;
+
+### Hipóteses:
+ 
+$H_0: \tau_1 = \tau2 = \tau3 = \tau4 = \tau5$
+
+$H_1:$ Pelo menos um dos tratamentos difere entre si.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(agricolae)
+tratamentos = c("Trat1","Trat2","Trat3","Trat4","Trat5")
+croqui = design.crd(trt=tratamentos,r=6)$book
+```
+
+### Croqui:
+
+|   |   |  |   |   |   |
+|:-:|:--|-:|:-:|:-:|:-:|
+|Trat5 |Trat1 |Trat3| Trat1| Trat3| Trat5|
+|Trat5 |Trat1 |Trat4| Trat4| Trat4| Trat4|
+|Trat1 |Trat3 |Trat1| Trat2| Trat2| Trat5|
+|Trat1 |Trat3 |Trat2| Trat3| Trat5| Trat2|
+|Trat4 |Trat2 |Trat2| Trat4| Trat5| Trat3|
+
+
+A partir dos resultados da produção da hortaliça, faremos o teste da ANOVA para verificar se houve diferença para os tratamentos.
+
+## Letra B
+
+### Modelo
+
+$$ Y_{ij} =  \mu + \beta_j + \tau_i + \varepsilon_{ij} $$ 
+
+$i = 1,\dots,I$
+
+$j = 1,\dots,J $
+
+onde 
+
+- $Y_{ij}$ é valor observado na parcela para o i-ésimo tratamento e j-ésima repetição ;
+
+- $\mu$ é uma constante inerente a todas as parcelas, geralmente a média geral ;
+ 
+- $\beta_j$ é o efeito do j-ésimo bloco;
+ 
+- $\tau_i$ é o efeito do i-ésimo tratamento;
+
+- $e_{ij}$ é o erro experimental na parcela i,j;
+
+### Hipóteses:
+
+- Hipóteses para os tratamentos
+ 
+$H_0: \tau_1 = \tau2 = \tau3 = \tau4 = \tau5$
+
+$H_1: \tau_i \neq \tau_j$, para algum i diferente de j.
+
+- Hipóteses para os blocos
+ 
+$H_0: \beta_1 = \beta2 = \beta3 = \beta4 = \beta5$
+
+$H_1: \beta_i \neq \beta_j$, para algum i diferente de j.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+require(agricolae)
+tratamentos <- c("T1","T2","T3","T4","T5")
+croqui_bdc = design.crd(trt=tratamentos,r=6)$book
+```
+
+
+### Croqui
+
+|   |   |  |   |   |   |
+|:-:|:--|-:|:-:|:-:|:-:|
+|Trat5 |Trat1 |Trat3| Trat5| Trat1| Trat1|
+|Trat3 |Trat5 |Trat1| Trat5| Trat3| Trat4|
+|Trat1 |Trat1 |Trat2| Trat4| Trat5| Trat4|
+|Trat5 |Trat4 |Trat3| Trat2| Trat4| Trat3|
+|Trat2 |Trat4 |Trat2| Trat2| Trat3| Trat2|
+
+
+# Questão 2
+
+## Letra A
+
+Queremos comparar a produção de variedades de mandioca em t/ha das variedades: Aipim bravo, Milagrosa, Sutina, Salango Preta, Mamão e Escondida em um ensaio de blocos casualizados. A competição foi realizada pelo Instituto de Pesquisa Agron^omica do Leste (Atual Centro Nacional de Pesquisa de Mandioca e Fruticultura, da EMBRAPA), em Cruz das Almas - BA.
+
+### Análise descritiva
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+trat = rep(1:6,4)
+trat = factor(trat)
+
+bloco = rep(1:4,each = 6)
+bloco = factor(bloco)
+
+resposta = c(14.5,5.7,5.3,4.6,14.8,8.2,15.8,5.9,7.7,7.1,12.6,8.2,24,10.5,10.2,10.4,18.8,12.7,17,6.6,9.6,10.8,16,17.5)
+
+dados = data.frame(bloco,trat,resposta)
+
+
+
+```
+
+
+```{r, echo = FALSE}
+boxplot(resposta~trat, xlab = "Tratamento", ylab = "Resposta")
+```
+
+
+Verificamos que os tratamentos diferem entre si. Os tratamentos 2, 3 e 4 possuem a menor média, ao passo que o tratamento 1 apresenta a maior média.
+
+```{r, echo = FALSE}
+boxplot(resposta~bloco,
+        xlab = "Bloco",
+        ylab = "Resposta")
+```
+
+
+Os blocos parecem diferir entre si. Verificamos que a mediana dos blocos 1 e 2 estão próximas entre so, ao passo que as medianas dos blocos 3 e 4 estão próximas entre si. Também verificamso que o bloco 1 possui maior dispersão, se comparado com o bloco 2 e que o bloco 3 possui assimetria à direita enquanto o bloco 4 parece ser simétrico.
+
+# Hipóteses
+
+- Hipóteses para os tratamentos
+ 
+$H_0: \tau_1 = \tau2 = \tau3 = \tau4 = \tau5$
+
+$H_1: \tau_i \neq \tau_j$, para algum i diferente de j.
+
+- Hipóteses para os blocos
+ 
+$H_0: \beta_1 = \beta2 = \beta3 = \beta4 = \beta5$
+
+$H_1: \beta_i \neq \beta_j$, para algum i diferente de j.
+
+# ANOVA
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+modelo = lm(resposta~trat+bloco)
+#summary(modelo)
+```
+
+A partir da análise de variância, verificamos que apenas o tratamento 5 não é significativos. Assim, podemos afirmar ao nível de 5% de significância que os tratamentos diferem entre si.
+
+Também verificamos que apenas o bloco 2 não é significativo, portanto, podemos afirmar com 5% de significância que os blocos diferem entre si.
+
+# Pressupostos do modelo
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+shapiro.test(rstandard(modelo)) 
+
+```
+O teste de Shapiro-Wilk apresenta p-valor = 0,1137 > 0,05 não rejeita a hipótese de Normalidade. Portanto, podemos afirmar ao nível de 5% de significância que os resíduos possuem distribuição Normal.
+
+```{r,  echo=FALSE, message=FALSE, warning=FALSE}
+library(lmtest)
+bptest(modelo)
+
+```
+
+O teste de Breusch-Pagan resulta num p-valor de 0,2637 > 0,05, portanto, não rejeitamos a hipótese de homocedasticidade dos resíduos. Assim, podemos afirmar ao nível de 5% de significância que os resíduos são homocedásticos.
+
+# Comparação de médias
+
+```{r,  echo=FALSE, message=FALSE, warning=FALSE}
+require(TukeyC)
+modelo.aov = aov(resposta~trat+bloco)
+#TukeyC(modelo.aov)
+
+```
+
+
+Pelo Teste de Tukey temos que as médias das variedades 1 e 5 aparentemente não diferem entre si, formando o grupo A com as maiores médias. O grupo B é formado pelas variedades 5 e 6 que aparentemente não diferem entre si. Finalmente, temos o grupo C com as menores médias, formado pelas variedades 6, 4, 3 e 2 e que aparentemente não diferem entre si.
+
+
+## Letra B
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+mamao = c(14.8, 12.6, 18.8, 16.0)
+escondida = c(8.2, 8.2, 12.7, 17.5)
+#t.test(mamao, escondida)
+```
+
+
+O intervalo de confinça para a diferença das médias da produção das variedades mamão e escondida é [-2,77; 10,58] que inclui o zero, e em conformidade com o p-valor indica que as médias das variedades mamão e escondida não são estatisticamente significantes.
+
+
+# Questão 3
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+cozimento = c(rep(1.5,18),rep(2,18))
+concentracao = c(rep(10,6),rep(15,6),rep(20,6),rep(10,6),rep(15,6),rep(20,6))
+drenagem = c(rep(350,2),rep(500,2),rep(650,2))
+drenagem = c(rep(drenagem,6))
+resposta = c(96.6,96,97.7,96,99.4,99.8,
+          98.5,97.2,96,96.9,98.4,97.6,
+          97.5,96.6,95.6,96.2,97.4,98.1,
+          98.4,98.6,99.6,100.4,100.6,100.9,
+          97.5,98.1,98.7,96,99.6,99,
+          97.6,98.4,97,97.8,98.5,99.8)
+dados = data.frame(as.factor(concentracao),as.factor(cozimento),as.factor(drenagem),as.factor(resposta))
+# a concentracao eh o bloco
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#Análise Exploratória
+require(lattice)
+require(latticeExtra)
+
+#Contagem
+```
+
+
+```{r, echo = FALSE, warning=FALSE}
+xyplot(resposta~cozimento)
+```
+
+
+
+```{r, echo = FALSE, warning=FALSE}
+boxplot(resposta~cozimento)
+```
+
+O tempo de cozimento de 2 horas possui resposta maior que o tempo de cozimento de 1,5h.
+
+
+```{r, echo = FALSE}
+xyplot(resposta~drenagem)
+```
+
+
+```{r, echo = FALSE, warning=FALSE}
+boxplot(resposta~drenagem)
+```
+
+Verificamos que quanto maior a dificuldade de drenagem, maior a resposta.
+
+## Interação
+
+```{r, echo = FALSE, warning=FALSE}
+interaction.plot(cozimento, drenagem,resposta)
+
+
+```
+
+Verificamos que há interação para a dificuldade de drenagem 500 e 350. Não há interação com a dificuldade de drenagem 650.
+
+
+```{r, echo = FALSE, warning=FALSE}
+interaction.plot(drenagem, cozimento,resposta)
+```
+
+Não verificamos interação para os tempos de cozimento.
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+require(ExpDes.pt)
+
+analise = fat2.dbc(fator1 = drenagem,
+                   fator2 = cozimento,
+                   bloco = concentracao,
+                   resp = resposta,
+                   fac.names = c("Drenagem","Cozimento"))
+
+```
+
+Temos que os fatores são significantes ao nível de 5% de significância. Por outro lado, a interação entre a drenagem e o cozimento não é significante.
+
+```{r, echo = FALSE, warning=FALSE}
+plotres(analise)
+```
+
+Verificamos que os resíduos parecem seguir uma distribuição Normal. 
