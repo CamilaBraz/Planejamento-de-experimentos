@@ -1,0 +1,141 @@
+---
+title: "Lista 2 - Planejamento de Experimentos"
+author: "Camila Braz Soares"
+date: "19 de maio de 2021"
+output: pdf_document
+---
+
+\newpage 
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(devtools)
+require(lmtest)
+require(TukeyC)
+
+# Do GitLab.
+url <- "https://gitlab.c3sl.ufpr.br/pet-estatistica/labestData.git"
+install_git(url = url, branch = "master")
+
+library(labestData)
+```
+
+\newpage
+
+# Questão 4
+
+## LETRA A
+
+ O conjunto de dados *PimentelEg5.2* refere-se ao experimento de competição de variedades de batatinha feito pelo Engenheiro Agrônomo Oscar A. Garay em Balcare, Argentina. O experimento foi realizado em blocos casualizados.
+ O conjunto de dados possui 32 observações e 3 variáveis, são elas: o bloco, a variedade e a produção.
+ 
+FORMATO:
+
+Um *data.frame* com 32 observações e 3 variáveis, em que:
+
+ - BLOCO
+ 
+Fator de 4 níveis qualitativos, usado para controle local.
+
+ - VARIEDADE
+ 
+Fator de 8 níveis qualitativos que são as variedades de batatinha.
+
+ - PRODUÇÃO
+ 
+Produção de batatinha, em ton $ha^{-1}$, nas unidades experimentais.
+
+## LETRA B
+
+** Hipóteses para os tratamentos:**
+
+$H_0: \tau_1 = \tau_2 = \tau_3 = \tau_4$
+$H_1:$ pelo menos dois tratamentos possuem médias diferentes.
+
+** Hipóteses para os blocos:**
+
+$H_0: B_1 = B_2 = B_3 = B_4$
+$H_1:$ pelo menos um dos blocos possuem médias diferentes.
+
+
+## LETRA C
+
+**Erros para os tratamentos**
+
+**Erro tipo I:** Afirmar que existem pelo menos dois tratamentos com efeitos diferentes, quando na realidade, todos os tratamentos possuem o mesmo efeito.
+
+**Erro tipo II:** Afirmar que todos os tratamentos são iguais, quando na realidade existem pelo menos dois tratamentos diferentes.
+
+
+**Erros para os tratamentos**
+
+**Erro tipo I:** Afirmar que existem pelo menos dois blocos com efeitos diferentes, quando na realidade, todos os blocos possuem o mesmo efeito.
+
+**Erro tipo II:** Afirmar que todos os blocos são iguais, quando na realidade existem pelo menos dois blocos diferentes.
+
+
+## LETRA D
+
+| Fonte de variação | g.l. | Soma Quad. | Média Quad. | F       | P-valor  |
+|-------------------|------|------------|-------------|---------|----------|
+| Tratamento        | 7    |   919,72   | 131,389     | 15,3744 | 5,723e-07| 
+| Bloco             |    3 |  50,53     | 16,843      |  1,9709 |   0,1493 |  
+| Resíduos          | 21   | 179,46     |   8,546     |         |          |
+|-------------------|------|------------|-------------|---------|----------|
+| Total             | 31   | 1.149,71   |             |         |          |
+
+Como o p-valor do tratamento é muito pequeno (p-valor < 0,01), temos evidências para rejeitar a hipótese nula ao nível de 1%, portanto, podemos afirmar que existem pelo menos dois tratamentos com efeitos diferentes.
+
+Para os blocos, temos que p-valor = 0,1493 > 0,10, não temos evidências para rejeitar a hipótese nula, portanto, podemos afirmar que os efeitos dos blocos são iguais.
+
+
+## LETRA E
+
+```{r}
+dados = PimentelEg5.2
+names(dados) = c("bloco", "trat", "resposta")
+
+
+modelo.aov = aov(resposta~trat+bloco, data = dados)
+TukeyC(modelo.aov)
+```
+
+
+De acordo com o Teste de Tukey temos que os melhores testes são o S. Rafalela e o Huinkul ao nível de 5%.
+
+## LETRA F
+
+
+**Teste de Normalidade**
+
+Para testar se os resíduos possuem distribuição Normal, vamos utilizar os teste de Shapiro-Wilks, cujas hipóteses são:
+
+$H_0:$ Os dados seguem uma distribuição Normal.
+
+$H_1:$ Os dados não seguem uma distribuição Normal.
+
+
+```{r}
+modelo = lm(resposta~trat+bloco, data = dados)
+
+shapiro.test(rstandard(modelo))
+```
+
+
+Como p-valor = 0,471 > 0,05, não temos evidências para rejeitar a hipótese de normalidade, portanto podemos afirmar que os resíduos seguem uma distribuição Normal.
+
+
+**Teste de homocedasticidade**
+
+Agora vamos testar se os resíduos possuem homocedasticidade utilizando o teste de Breusch-Pagan, cujas hipóteses são:
+
+$H_0:$ Os dados são homocedásticos.
+
+$H_1:$ Os dados não são homocedásticos.
+
+```{r}
+bptest(modelo)
+```
+
+
+A partir do teste de Breusch-Pagan obtemos um p-valor = 0,2881 > 0,05, portanto, não temos evidências para rejeitar a hipótese de homocedasticidade, portanto, podemos afirmar ao nível de 5% de significância os resíduos são homocedásticos.
+
